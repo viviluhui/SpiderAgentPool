@@ -57,11 +57,11 @@ class ProxyManager(object):
 
 
     def write(self,proxys):
+        log.info("starting sets into db [{}]".format(self.m_runParam.dbRawName))
+        self.db.chgHashName(self.m_runParam.dbRawName)
+        self.db.sets(proxys)
         log.info("starting sets into db [{}]".format(self.m_runParam.dbUsrName))
         self.db.chgHashName(self.m_runParam.dbUsrName)
-        self.db.sets(proxys)
-        log.info("starting sets into db [{}]".format(self.m_runParam.dbChkName))
-        self.db.chgHashName(self.m_runParam.dbChkName)
         self.db.sets(proxys)
 
 

@@ -112,6 +112,9 @@ class CrawlerProxyBase(object):
 
             ###获取网页内容
             res = web(url)
+            if res is None:
+                log.error("network error")
+                break
             self.crawlSeenDic[url] = self.crawlSeenDic.setdefault(url,0) + 1
 
             #调用回调函数获取网页有效链接
@@ -166,6 +169,9 @@ class CrawlerProxyBase(object):
 
             ###获取网页内容
             res = web(url)
+            if res is None:
+                log.error("network error")
+                break
             self.crawlSeenDic[url] = self.crawlSeenDic.setdefault(url, 0) + 1
 
             # 调用回调函数获取网页有效链接

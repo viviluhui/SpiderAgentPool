@@ -16,6 +16,7 @@ from apscheduler.schedulers.blocking import BlockingScheduler
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 from Schedule.ProxyValidCheck import ProxyVaildCheck
 from Util.RunParam import RunParam
+from Util.UtilTool import validNetWork
 from Util.LogHandler import *
 from Db.DbFactory import DbFactory
 
@@ -60,7 +61,7 @@ class ProxyValidSchedule(object):
 
         :return:
         """
-        self.db.chgHashName(self.m_runParam.dbChkName)
+        self.db.chgHashName(self.m_runParam.dbUsrName)
         # proxys = self.db.gets()
         self.proxys = self.db.getAll()
         # print(type(self.proxys))
@@ -68,6 +69,12 @@ class ProxyValidSchedule(object):
             self.queue.put(k)
 
 def mainRun():
+    try:
+        validNetWork()
+        log.info("网络正常....")
+    except Exception as e:
+        log.error("网络异常....")
+        return
     p = ProxyValidSchedule()
     p.run()
 
@@ -76,7 +83,7 @@ def run():
     # p.run()
     mainRun()
     sch = BlockingScheduler()
-    sch.add_job(mainRun, "interval", minutes=10)
+    sch.add_job(mainRun, "interval", minutes=5)
     sch.start()
 
 

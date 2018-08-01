@@ -22,7 +22,6 @@ def refreshPool(p,proxy):
     print(proxy.name)
     p.refreshProxy(proxy)
 
-
 def gProxyRefresh():
     p = ProxyManager()
 
