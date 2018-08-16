@@ -1,7 +1,12 @@
-
 互联网免费代理池
     爬取互联网免费代理，采集数据使用SSDB或其它存储，采用多线程对代理进行验证，对外提供WEB API调用方式。
 
+<<<<<<< HEAD
+互联网免费代理池
+    爬取互联网免费代理，采集数据使用SSDB或其它存储，采用多线程对代理进行验证，对外提供WEB API调用方式。
+
+=======
+>>>>>>> 2af44f87af41633426f1f53edc12c34038ca2e16
 下载安装
 ----GIT SHELL方式
 git clone git@github.com:viviluhui/SpiderAgentPool.git
@@ -46,6 +51,7 @@ API
 
 
 
+<<<<<<< HEAD
 --20180802更新
     ssdbDao.py  方法pop，gets修改
 --20180815更新
@@ -57,3 +63,8 @@ API
 代理效验开多线程处理依然较慢，需重新设计
 设计网页显示代理数据
 CrawlerProxyBase.py  __runFlag  需改进为异步修改，比如增加一个进程可以操作
+=======
+--20180802更新设想
+SsdbDao.py  方法pop，gets修改
+代理效验开多线程处理依然较慢，需重新设计
+>>>>>>> 2af44f87af41633426f1f53edc12c34038ca2e16
