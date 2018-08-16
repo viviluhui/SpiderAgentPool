@@ -7,6 +7,7 @@
    Author :       lf
    date：         2018/07/20
 -------------------------------------------------
+------------------2018/08/15    __runFlag 目前无法立即停止itemWriter，程序内部变量，无法异步修改
 '''
 
 
@@ -77,7 +78,7 @@ class CrawlerProxyBase(object):
         :return:
         """
         self.stop()
-
+        self.crawlQueue.clear()
         self.crawlQueue = self.__crawlQueue[:]
         self.seedQueue = self.__seedQueue[:]
 
@@ -90,6 +91,8 @@ class CrawlerProxyBase(object):
         :return:
         """
         self.__runFlag = False
+        self.crawlQueue.clear()
+
 
     def iteritem(self,intervalTime=1):
         """
@@ -151,8 +154,9 @@ class CrawlerProxyBase(object):
         :param cache:       数据存储协议 输入
         :param page:        从seed开始爬取最大网址数量 负数表示不限制
         :param intervalTime:
-        :return:
+        :return:    返回抓取数据量
         """
+        count = 0
         __page = page
         while self.crawlQueue:
             # 运行标志
@@ -194,7 +198,7 @@ class CrawlerProxyBase(object):
                 try:
                     result = self.funcScrapeCallBck(res)
                     log.info("funcScrapeCallBck value:{}".format(result))
-
+                    count += len(result)
                     if self.cache:
                         self.cache.write(result)
                 except Exception as e:
@@ -212,6 +216,7 @@ class CrawlerProxyBase(object):
             if len(self.crawlQueue) == 0 and self.seedQueue is not None and len(self.seedQueue) > 0:
                 self.crawlQueue.append(self.seedQueue.pop())
 
+        return count
 
 if __name__ == '__main__':
     urlList = [

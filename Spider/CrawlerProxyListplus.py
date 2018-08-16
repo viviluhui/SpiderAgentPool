@@ -71,7 +71,7 @@ class CrawlerProxyListplus(CrawlerProxyBase):
         except Exception as e:
             log.error("exception:{}".format(e))
             raise Exception
-        print(result)
+        # print(result)
         return result
 
     def scrapeCallback(self, html):

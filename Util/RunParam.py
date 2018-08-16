@@ -1,5 +1,16 @@
 #coding = utf8
 """
+-------------------------------------------------
+   File Name：     RunParam.py
+   Description :  程序运行参数
+   Author :       lf
+   date：         2018/08/15
+-------------------------------------------------
+   Change Activity:
+                   2018/08/15:  自定义ConfigParse类由UtilTool模块提出，原因是移植方便
+-------------------------------------------------
+"""
+"""
 程序运行参数
 """
 
@@ -11,7 +22,23 @@ import sys
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 from Util.UtilTool import LazyProperty
-from Util.UtilTool import ConfigParse
+
+"""
+    封装配置文件解析类
+"""
+from configparser import ConfigParser   #py3
+
+class ConfigParse(ConfigParser):
+    def __init__(self):
+        super(ConfigParse, self).__init__()
+
+    def optionxform(self, optionstr):
+        return optionstr
+
+    def readInit(self):
+        self.pwd = os.path.split(os.path.realpath(__file__))[0]
+        self.configPath = os.path.join(os.path.split(self.pwd)[0],'config.ini')
+        self.read(self.configPath,'utf8')
 
 class RunParam(object):
     """

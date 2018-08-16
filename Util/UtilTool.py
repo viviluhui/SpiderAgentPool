@@ -32,23 +32,6 @@ class LazyProperty(object):
         setattr(instance,self.func.__name__,val)
         return val
 
-"""
-    封装配置文件解析类
-"""
-from configparser import ConfigParser   #py3
-
-class ConfigParse(ConfigParser):
-    def __init__(self):
-        super(ConfigParse, self).__init__()
-
-    def optionxform(self, optionstr):
-        return optionstr
-
-    def readInit(self):
-        self.pwd = os.path.split(os.path.realpath(__file__))[0]
-        self.configPath = os.path.join(os.path.split(self.pwd)[0],'config.ini')
-        self.read(self.configPath,'utf8')
-
 def validNetWork():
     # exit_code = os.popen('ping www.baidu.com').read()
     # print(exit_code)
@@ -77,3 +60,4 @@ def validUsefulProxy(proxy):
     except Exception as e:
         # logger.error(str(e))
         return False
+

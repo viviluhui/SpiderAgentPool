@@ -22,6 +22,7 @@ class SpiderFactory(object):
 
     抽象方法:
 
+    __init__                cache代表缓存类，需有write方法
     start(spn=)             开始爬虫,iteritem模式时控制
     stop(spn=)              停止爬虫,iteritem模式时控制
     iteritem(spn,)          生成器返回抓取代理结果
@@ -49,7 +50,19 @@ class SpiderFactory(object):
         self.__splider.stop()
 
     def iteritem(self,intervalTime=1):
+        """
+            抓取一页睡眠时间
+        :param intervalTime:
+        :return:
+        """
         return self.__splider.iteritem(intervalTime)
 
-    def itemWriter(self,writer=None,page=-1):
-        self.__splider.itemWriter(writer,page=page)
+    def itemWriter(self,cache=None,page=-1,intervalTime=1):
+        """
+            抓取一页将类容调用catch.write 方法保存.page表示抓取页数,-1表示页数无限制
+        :param catch:
+        :param page:
+        :param intervalTime:
+        :return:
+        """
+        return self.__splider.itemWriter(cache=cache,page=page,intervalTime=intervalTime)

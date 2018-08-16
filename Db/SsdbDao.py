@@ -8,7 +8,8 @@
    date：         2018/07/18
 -------------------------------------------------
    Change Activity:
-                  2018/07/18:
+                  2018/07/18:   init
+                  2018/08/15:   修改代码
 ----
 '''
 
@@ -16,8 +17,6 @@ __author__ = 'lf'
 
 import pyssdb
 import random
-import sys
-from Util.LogHandler import *
 
 class SsdbDao(object):
     """
@@ -28,7 +27,8 @@ class SsdbDao(object):
     """
     name = ""
 
-    def __init__(self,host,port):
+
+    def __init__(self, host, port):
         """
         init
         :param name: hash name
@@ -36,20 +36,19 @@ class SsdbDao(object):
         :param port: ssdb host port
         :return
         """
-        log.info("host:{} port:{}".format(host,port))
         try:
-            self.__conn = pyssdb.Client(host,int(port))
-            log.info("db conect success")
+            self.__conn = pyssdb.Client(host, int(port))
         except Exception as e:
             self.__conn = None
-            log.error("exception:{}".format(e))
+            raise e
+
 
     def __del__(self):
-        if self.__conn is not None and hasattr(self.__conn,'disconnect'):
-            # log.info("disconect starting")
+        if self.__conn is not None and hasattr(self.__conn, 'disconnect'):
             self.__conn.disconnect()
 
-    def get(self,key):
+
+    def get(self, key):
         """
         从hash中获取对应的proxy，使用chngHashName修改指定hash name,
         :param proxy:
@@ -59,21 +58,22 @@ class SsdbDao(object):
         try:
             return self.__conn.hget(self.name, key)
         except Exception as e:
-            log.error("exception:{}".format(e))
+            raise e
 
-    def gets(self):
+
+    def gets(self, num=100):
         """
-        随机弹出一个代理
-        :param name:
-        :return: dict {proxy:value}
+            获取一批代理
+        :param num:
+        :return:
         """
         try:
-            return self.__conn.hkeys(self.name,"","",100)
+            return self.__conn.hkeys(self.name, "", "", num)
         except Exception as e:
-            log.error("exception:{}".format(e))
-        return None
+            raise e
 
-    def set(self,key,value):
+
+    def set(self, key, value):
         """
         将代理放入hash,使用chngHashName修改指定hash name,
         :param proxy:
@@ -81,11 +81,12 @@ class SsdbDao(object):
         :return:
         """
         try:
-            self.__conn.hset(self.name,key,value)
+            self.__conn.hset(self.name, key, value)
         except Exception as e:
-            log.error("exception:{}".format(e))
+            raise e
 
-    def delete(self,key):
+
+    def delete(self, key):
         """
         将代理从hash删除,使用chngHashName修改指定hash name,
         :param key:
@@ -93,9 +94,10 @@ class SsdbDao(object):
         :return:
         """
         try:
-            self.__conn.hdel(self.name,key)
+            self.__conn.hdel(self.name, key)
         except Exception as e:
-            log.error("exception:{}".format(e))
+            raise e
+
 
     # def update(self,key,value):
     #     """
@@ -110,26 +112,47 @@ class SsdbDao(object):
     #     except Exception as e:
     #         log.error("exception:{}".format(e))
 
-    def pop(self,DeF=False):
+    def pop(self, seq=False, isDelete=False):
         """
-        随机弹出一个代理
+            弹出一条数据
         :param name:
         :return: dict {proxy:value}
         """
         try:
-            proxys = self.__conn.hkeys(self.name,"","",100)
-            if proxys is not None:
-                # log.info(proxys)
-                proxy = random.choice(proxys)
-                value = self.__conn.hget(self.name,proxy)
-                if DeF:
-                    self.delete(proxy)
-                return {'proxy':proxy,'value':value}
-        except Exception as e:
-            log.error("exception:{}".format(e))
-        return None
+            if seq:
+                key = self.__conn.hscan(self.name, "", "", 1)
+            else:
+                key = self.__conn.hrscan(self.name, "", "", 1)
+            if key is not None:
+                if isDelete:
+                    self.delete(key)
 
-    def exists(self,key):
+                value = self.__conn.hget(self.name, key)
+                return {'key': key, 'value': value}
+        except Exception as e:
+            raise e
+
+
+    def random(self, seed=100, isDelete=False):
+        """
+            随机弹出一个代理
+        :param name:
+        :return: dict {proxy:value}
+        """
+        try:
+            proxys = self.__conn.hkeys(self.name, "", "", seed)
+            if proxys is not None:
+                # log(proxys)
+                proxy = random.choice(proxys)
+                value = self.__conn.hget(self.name, proxy)
+                if isDelete:
+                    self.delete(proxy)
+                return {'key': proxy, 'value': value}
+        except Exception as e:
+            raise e
+
+
+    def exists(self, key):
         """
 
         :param key:
@@ -137,9 +160,10 @@ class SsdbDao(object):
         :return:
         """
         try:
-            return int(self.__conn.hexists(self.name,key).decode('utf8'))
+            return int(self.__conn.hexists(self.name, key).decode('utf8'))
         except Exception as e:
-            log.error("exception:{}".format(e))
+            raise e
+
 
     def getAll(self):
         """
@@ -151,12 +175,13 @@ class SsdbDao(object):
             items = self.__conn.hgetall(self.name)
             itemDict = dict()
             for i in range(0, len(items), 2):
-                itemDict[items[i]] = items[i+1]
+                itemDict[items[i]] = items[i + 1]
             return itemDict
         except Exception as e:
-            log.error("exception:{}".format(e))
+            raise e
 
-    def getProxyCount(self):
+
+    def getCount(self):
         """
 
         :param name:
@@ -165,9 +190,10 @@ class SsdbDao(object):
         try:
             return self.__conn.hlen(self.name)
         except Exception as e:
-            log.error("exception:{}".format(e))
+            raise e
 
-    def chgHashName(self,name):
+
+    def chgHashName(self, name):
         """
 
         :param name:

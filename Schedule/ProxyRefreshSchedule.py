@@ -11,33 +11,19 @@
 import sys
 import os
 import time
-from Util.RunParam import RunParam
 from threading import Thread
 from apscheduler.schedulers.blocking import BlockingScheduler
 from Manager.ProxyManager import ProxyManager
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
+p = ProxyManager()
 
 def refreshPool(p,proxy):
-    print(proxy.name)
+    # print(proxy.name)
     p.refreshProxy(proxy)
 
-def gProxyRefresh():
-    p = ProxyManager()
-
-    pl = []
-    for item in p.iterSpider():
-        proc = Thread(target=refreshPool,args=(p,item))
-        pl.append(proc)
-        proc.setDaemon(True)        #设置线程为后台线程，前台线程结束，后台线程立即结束
-        proc.start()
-
-    for proc in pl:
-        proc.join()
-
 def uProxyRefresh():
-    p = ProxyManager()
-
+    print(p.getSplider())
     pl = []
     for item in p.iterSpider():
         proc = Thread(target=refreshPool,args=(p,item))

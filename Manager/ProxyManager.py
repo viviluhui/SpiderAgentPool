@@ -9,13 +9,12 @@
 -------------------------------------------------
 '''
 
-import sys
-import os
 from Spider.SpiderFactory import SpiderFactory
 from Util.UtilTool import Singleton
 from Util.RunParam import RunParam
 from Util.LogHandler import *
-from Db.DbFactory import DbFactory
+from Cache.DbCache import Catch
+import time
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
@@ -24,8 +23,20 @@ class ProxyManager(object):
     __metaclass__ = Singleton
 
     def __init__(self):
+        """
+            self.__splider      {
+                                    spider:{    spider:class,       爬虫对象
+                                                status:True/False,  爬虫状态
+                                                runTime:second,     爬虫运行时间
+                                                stime:,             爬虫开始运行时间
+                                                etime:,             爬虫结束运行时间
+                                                count,              上次爬取结果数量
+                                                total,              爬取总结果数量
+                                           }
+                                }
+        """
         self.__splider = {}
-        self.db = DbFactory()
+        self.catch = Catch()
         self.m_runParam = RunParam()
         self.__initSplider()
         # self.__page = int(self.m_runParam.proxyPage)
@@ -37,7 +48,7 @@ class ProxyManager(object):
         """
         for proxyGetter,v in self.m_runParam.proxyGetterDict:
             try:
-                self.add(proxyGetter.strip(),proxyGetter.strip(),v.split(','),self)
+                self.add(key=proxyGetter.strip(),spiderName=proxyGetter.strip(),url=v.split(','),cache=self.catch)
             except Exception as e:
                 log.error("exception:{}".format(e))
 
@@ -56,15 +67,6 @@ class ProxyManager(object):
     #         return False
 
 
-    def write(self,proxys):
-        log.info("starting sets into db [{}]".format(self.m_runParam.dbRawName))
-        self.db.chgHashName(self.m_runParam.dbRawName)
-        self.db.sets(proxys)
-        log.info("starting sets into db [{}]".format(self.m_runParam.dbUsrName))
-        self.db.chgHashName(self.m_runParam.dbUsrName)
-        self.db.sets(proxys)
-
-
     def pop(self,key):
         return self.__splider.pop(key)
 
@@ -76,7 +78,20 @@ class ProxyManager(object):
         :return:
         """
         mSplider = SpiderFactory(spiderName,seedUrlList=url,cache=cache)
-        self.__splider[key] = mSplider
+        m = {}
+        m['spider'] = mSplider
+        m['status'] = True
+        m['runTime'] = time.strftime("%Y%m%d%H%M%S")
+        m['stime'] = time.strftime("%Y%m%d%H%M%S")
+        m['etime'] = time.strftime("%Y%m%d%H%M%S")
+        m['count'] = 0
+        m['total'] = 0
+
+        self.__splider[key] = m
+
+    def restartSpider(self):
+        for k,proxy in self.__splider.items():
+            proxy['spider'].restart()
 
     def iterSpider(self):
         for k,proxy in self.__splider.items():
@@ -84,78 +99,35 @@ class ProxyManager(object):
 
     def refreshProxy(self, proxy):
         """
-
+            根据代理爬虫类更新数据
         :param proxy:
         :return:
         """
-        log.info("starting write date to db [{}]".format(self.m_runParam.dbRawName))
-        self.db.chgHashName(self.m_runParam.dbRawName)
-
-        log.info("{func}: fetch proxy start".format(func=proxy.name))
-        ####1
-        # for item in proxy.iteritem(1):
-        #     log.info("the value:{}".format(item))
-        #     self.db.sets(item)
-        #     item.stop if pg == 0 else pg -= 1
-        proxy.itemWriter(page=int(self.m_runParam.proxyPage))
-        log.info("{func}: fetch proxy end  ".format(func=proxy.name))
+        log.info("{func}: fetch proxy start".format(func=proxy['spider'].name))
+        n = proxy['spider'].itemWriter(page=int(self.m_runParam.proxyPage))
+        log.info("{func}: fetch proxy end  ".format(func=proxy['spider'].name))
+        proxy['stime'] = time.strftime("%Y%m%d%H%M%S")
+        proxy['etime'] = time.strftime("%Y%m%d%H%M%S")
+        proxy['count'] = n
+        proxy['total'] += n
 
     def refreshAllProxy(self):
         """
-        所有爬虫zawqrsxz
+        所有爬虫
         :return:
         """
-        log.info("starting write date to db [{}]".format(self.m_runParam.dbRawName))
-        self.db.chgHashName(self.m_runParam.dbRawName)
-        # self.db.chgHashName("test")
-
         for k,proxy in self.__splider.items():
-            log.info("{func}: fetch proxy start".format(func=proxy.name))
-            proxy.itemWriter(page=int(self.m_runParam.proxyPage))
-            # for item in proxy.iteritem(1):
-            #     log.info("the value:{}".format(item))
-            #     self.db.sets(item)
-            #     proxy.stop()
-            #     if pg == 0:
-            #         proxy.stop()
-            #     else:
-            #         pg -= 1
-            log.info("{func}: fetch proxy end  ".format(func=proxy.name))
+            log.info("{func}: fetch proxy start".format(func=proxy['spider'].name))
+            n = proxy['spider'].itemWriter(page=int(self.m_runParam.proxyPage))
+            log.info("{func}: fetch proxy end  ".format(func=proxy['spider'].name))
+            proxy['stime'] = time.strftime("%Y%m%d%H%M%S")
+            proxy['etime'] = time.strftime("%Y%m%d%H%M%S")
+            proxy['count'] = n
+            proxy['total'] += n
 
-
-    def popProxy(self,DeF=False):
-        """
-        #获取代理
-        :param DeF: 弹出后是否删除标志
-        :return:
-        """
-        log.info("starting pop from db [{}]".format(self.m_runParam.dbUsrName))
-        self.db.chgHashName(self.m_runParam.dbUsrName)
-        # self.db.chgHashName(self.m_runParam.dbRawName)
-        return self.db.pop(DeF)
-
-    def deleteProxy(self,proxy):
-        """
-        #删除代理
-        :param proxy:
-        :return:
-        """
-        log.info("starting delete from db [{}]".format(self.m_runParam.dbUsrName))
-        self.db.chgHashName(self.m_runParam.dbUsrName)
-        # self.db.chgHashName(self.m_runParam.dbRawName)
-        self.db.delete(proxy)
-
-    def getProxy(self,key):
-        """
-        #获取代理
-        :return:
-        """
-        log.info("starting delete from db [{}]".format(self.m_runParam.dbUsrName))
-        self.db.chgHashName(self.m_runParam.dbUsrName)
-        # self.db.chgHashName(self.m_runParam.dbRawName)
-        self.db.get(key)
+    def getSplider(self):
+        return self.__splider
 
 if __name__ == "__main__":
     m = ProxyManager()
     m.refreshAllProxy()
-    log.info(m.pop())

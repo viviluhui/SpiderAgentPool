@@ -46,3 +46,14 @@ API
 
 
 
+--20180802更新
+    ssdbDao.py  方法pop，gets修改
+--20180815更新
+    ProxyManager.py  将数据库操作拆分到类DbCache,修改__splider字典结构，增加对各爬虫爬取信息,修改DbFactory.py,SsdbDao.py
+
+
+
+
+代理效验开多线程处理依然较慢，需重新设计
+设计网页显示代理数据
+CrawlerProxyBase.py  __runFlag  需改进为异步修改，比如增加一个进程可以操作

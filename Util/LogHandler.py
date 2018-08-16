@@ -94,7 +94,7 @@ class LogHandler(logging.Logger):
         self.removeHandler(self.fHandler)
         self.__setFileHandler__()
 
-log = LogHandler(name='run.log',path='../logs',stdout=True,File=True)
+log = LogHandler(name='run.log',path='../logs',stdout=False,File=True)
 
 if __name__ == '__main__':
     # log = LogHandler(name='run.log',path='../logs',stdout=True,File=True)
