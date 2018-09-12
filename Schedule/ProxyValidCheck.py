@@ -15,8 +15,7 @@ from threading import Thread
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 from Util.UtilTool import validUsefulProxy
 from Util.UtilTool import validNetWork
-from Util.RunParam import RunParam
-from Db.DbFactory import DbFactory
+from Cache.DbCache import Catch
 from Util.LogHandler import *
 
 MAXFCNT = 5
@@ -25,8 +24,7 @@ class ProxyVaildCheck(Thread):
     def __init__(self,queue,proxysDict,index):
         Thread.__init__(self)
         self.queue = queue
-        self.db = DbFactory()
-        self.m_runParam = RunParam()
+        self.cache = Catch()
         self.proxysDict = proxysDict
         self.index = index
         self.iFailedCount = MAXFCNT
@@ -49,9 +47,10 @@ class ProxyVaildCheck(Thread):
             else:
                 # self.deleteProxy(proxy)
                 log.info('ProxyVaildCheck{}: {} validation fail'.format(self.index, proxy))
-                log.info("starting delete from db [{}]".format(self.m_runParam.dbUsrName))
-                self.db.chgHashName(self.m_runParam.dbUsrName)
-                self.db.delete(proxy)
+                # log.info("starting delete from db [{}]".format(self.m_runParam.dbUsrName))
+                # self.db.chgHashName(self.m_runParam.dbUsrName)
+                # self.db.delete(proxy)
+                self.cache.deleteProxy(proxy)
                 self.iFailedCount -= 1
                 if self.iFailedCount <= 0:
                     try:

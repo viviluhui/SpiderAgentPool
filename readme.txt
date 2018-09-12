@@ -1,12 +1,7 @@
 互联网免费代理池
     爬取互联网免费代理，采集数据使用SSDB或其它存储，采用多线程对代理进行验证，对外提供WEB API调用方式。
 
-<<<<<<< HEAD
-互联网免费代理池
-    爬取互联网免费代理，采集数据使用SSDB或其它存储，采用多线程对代理进行验证，对外提供WEB API调用方式。
 
-=======
->>>>>>> 2af44f87af41633426f1f53edc12c34038ca2e16
 下载安装
 ----GIT SHELL方式
 git clone git@github.com:viviluhui/SpiderAgentPool.git
@@ -49,22 +44,21 @@ API
     配置文件ProxyGetter项填加新增类名与抓取初始地址
 
 
+---------问题
+1、代理效验开多线程处理依然较慢，需重新设计
+2、设计网页显示代理数据
+3、CrawlerProxyBase.py  __runFlag  需改进为异步修改，比如增加一个进程可以操作
+4、ProxyValidSchedule.py与ProxyRefreshSchedule.py同时运行，日志会有问题，导致程序异常。
 
 
-<<<<<<< HEAD
+
+
+
+
+---------更新历史
 --20180802更新
     ssdbDao.py  方法pop，gets修改
 --20180815更新
     ProxyManager.py  将数据库操作拆分到类DbCache,修改__splider字典结构，增加对各爬虫爬取信息,修改DbFactory.py,SsdbDao.py
 
 
-
-
-代理效验开多线程处理依然较慢，需重新设计
-设计网页显示代理数据
-CrawlerProxyBase.py  __runFlag  需改进为异步修改，比如增加一个进程可以操作
-=======
---20180802更新设想
-SsdbDao.py  方法pop，gets修改
-代理效验开多线程处理依然较慢，需重新设计
->>>>>>> 2af44f87af41633426f1f53edc12c34038ca2e16

@@ -43,6 +43,9 @@ class SpiderFactory(object):
         if self.__splider is None:
             raise Exception
 
+    def restart(self):
+        self.__splider.restart()
+
     def start(self):
         self.__splider.start()
 

@@ -16,15 +16,17 @@ from queue import Queue
 from apscheduler.schedulers.blocking import BlockingScheduler
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 from Schedule.ProxyValidCheck import ProxyVaildCheck
-from Util.RunParam import RunParam
 from Util.UtilTool import validNetWork
 from Util.LogHandler import *
+from Util.RunParam import RunParam
 from Db.DbFactory import DbFactory
+from Cache.DbCache import Catch
 
 class ProxyValidSchedule(object):
     def __init__(self):
         self.queue = Queue()
-        self.db = DbFactory()
+        # self.db = DbFactory()
+        self.cache = Catch()
         self.m_runParam = RunParam()
         self.proxys = None
 
@@ -62,10 +64,11 @@ class ProxyValidSchedule(object):
 
         :return:
         """
-        self.db.chgHashName(self.m_runParam.dbUsrName)
-        # proxys = self.db.gets()
-        self.proxys = self.db.getAll()
+        # self.db.chgHashName(self.m_runParam.dbUsrName)
+        # # proxys = self.db.gets()
+        # self.proxys = self.db.getAll()
         # print(type(self.proxys))
+        self.proxys = self.cache.getAllProxy()
         for k,v in self.proxys.items():
             self.queue.put(k)
 

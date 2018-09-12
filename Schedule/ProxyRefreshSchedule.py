@@ -23,7 +23,11 @@ def refreshPool(p,proxy):
     p.refreshProxy(proxy)
 
 def uProxyRefresh():
-    print(p.getSplider())
+
+    for item in p.getSplider().items():
+        print(item)
+
+    p.restartSpider()
     pl = []
     for item in p.iterSpider():
         proc = Thread(target=refreshPool,args=(p,item))

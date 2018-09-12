@@ -74,11 +74,11 @@ class CrawlerProxyBase(object):
 
     def restart(self):
         """
-
+            爬虫恢复初始爬取地址
         :return:
         """
         self.stop()
-        self.crawlQueue.clear()
+
         self.crawlQueue = self.__crawlQueue[:]
         self.seedQueue = self.__seedQueue[:]
 

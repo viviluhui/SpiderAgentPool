@@ -90,6 +90,10 @@ class ProxyManager(object):
         self.__splider[key] = m
 
     def restartSpider(self):
+        """
+            爬虫运行结束后
+        :return:
+        """
         for k,proxy in self.__splider.items():
             proxy['spider'].restart()
 
@@ -104,7 +108,11 @@ class ProxyManager(object):
         :return:
         """
         log.info("{func}: fetch proxy start".format(func=proxy['spider'].name))
-        n = proxy['spider'].itemWriter(page=int(self.m_runParam.proxyPage))
+        try:
+            n = proxy['spider'].itemWriter(page=int(self.m_runParam.proxyPage))
+        except Exception as e:
+            n = 0
+            log.error("proxy refresh error")
         log.info("{func}: fetch proxy end  ".format(func=proxy['spider'].name))
         proxy['stime'] = time.strftime("%Y%m%d%H%M%S")
         proxy['etime'] = time.strftime("%Y%m%d%H%M%S")

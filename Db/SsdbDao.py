@@ -9,7 +9,7 @@
 -------------------------------------------------
    Change Activity:
                   2018/07/18:   init
-                  2018/08/15:   修改代码
+                  2018/08/15:   取消所有打印，独立模块
 ----
 '''
 
@@ -31,7 +31,6 @@ class SsdbDao(object):
     def __init__(self, host, port):
         """
         init
-        :param name: hash name
         :param host: ssdb host ip
         :param port: ssdb host port
         :return
@@ -65,7 +64,7 @@ class SsdbDao(object):
         """
             获取一批代理
         :param num:
-        :return:
+        :return:	dict {proxy:value}
         """
         try:
             return self.__conn.hkeys(self.name, "", "", num)
